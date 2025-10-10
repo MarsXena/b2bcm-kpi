@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pharma KPI Recommender • B2B Creative Marketing</title>
+<meta name="description" content="Interactive KPI recommender for pharma & life-sciences marketing. Pick your scenario and get recommended KPIs, data sources, and next actions." />
+<meta name="theme-color" content="#0a1728" />
+
+<!-- Icons -->
+<link rel="icon" href="favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="favicon-512.png" sizes="512x512" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+
+<!-- Social (Open Graph / Twitter) -->
+<meta property="og:title" content="Pharma & Life-Sciences Omnichannel KPI Recommender" />
+<meta property="og:description" content="Free, interactive tool: choose your scenario → get KPIs, data sources, and next actions." />
+<meta property="og:image" content="og-b2bcm-kpi.png" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Pharma & Life-Sciences Omnichannel KPI Recommender" />
+<meta name="twitter:description" content="Free, interactive tool: choose your scenario → get KPIs, data sources, and next actions." />
+<meta name="twitter:image" content="og-b2bcm-kpi.png" />
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{--navy:#0a1728;--navy2:#17283f;--purple:#8b5cf6;--glass:rgba(23,23,40,.6)}
+  body{font-family:'Inter',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       background: radial-gradient(1200px 800px at 20% 10%, rgba(139,92,246,.18), transparent 50%),
+                  radial-gradient(1000px 700px at 80% 80%, rgba(240,171,252,.14), transparent 55%),
+                  linear-gradient(180deg, var(--navy), var(--navy2)); color:#eef2ff;}
+  .card{background-color:var(--glass); border:1px solid rgba(139,92,246,.35); backdrop-filter:blur(10px)}
+  .pill{background:rgba(139,92,246,.12); border:1px solid rgba(139,92,246,.3)}
+  .title-glow{text-shadow:0 0 10px rgba(227,199,112,.35), 0 0 18px rgba(139,92,246,.2)}
+
+  /* HIGH CONTRAST SELECTS */
+  .select-dark{
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #152338; /* darker background */
+    color: #eef2ff;            /* bright text */
+    border: 1px solid rgba(139, 92, 246, .6);
+    padding: .5rem .75rem;
+    border-radius: .5rem;
+  }
+  .select-dark:focus{ outline: 2px solid rgba(227,199,112,.55); outline-offset: 2px; }
+  .select-dark::-ms-expand { display: none; } /* IE/Edge arrow */
+  /* Some browsers honor option styling */
+  option{ background-color:#0f1a30; color:#eef2ff; }
+  /* Hint to use dark menus on supported UAs */
+  :root{ color-scheme: dark; }
+</style>
+</head>
+<body class="min-h-screen">
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <header class="text-center mb-8">
+      <h1 class="text-3xl md:text-4xl font-extrabold title-glow">Pharma KPI Recommender (If‑This‑Then‑That)</h1>
+      <p class="text-purple-200 mt-2">Pick your scenario → get recommended KPIs, data sources, and next actions.</p>
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <a href="B2BCM_Pharma_KPI_Map.xlsx" download
+           class="inline-flex items-center gap-2 rounded-xl bg-amber-400/90 px-4 py-2 font-semibold text-black hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          Download Excel KPI Map
+        </a>
+        <a href="#contact" class="inline-flex items-center gap-2 rounded-xl border border-purple-400/40 px-4 py-2 font-semibold text-purple-100 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-300/30">Talk about a personalized rollout</a>
+      </div>
+    </header>
+
+    <!-- Controls -->
+    <section class="card rounded-2xl p-5 mb-6">
+      <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div>
+          <label class="block text-sm text-purple-200 mb-1">Goal</label>
+          <select id="goal" class="select-dark w-full">
+            <option>Awareness</option>
+            <option>Engagement</option>
+            <option>Conversion</option>
+            <option>Retention</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-purple-200 mb-1">Audience</label>
+          <select id="audience" class="select-dark w-full">
+            <option>HCP</option>
+            <option>Patient</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-purple-200 mb-1">Channel</label>
+          <select id="channel" class="select-dark w-full">
+            <option>Paid</option>
+            <option>Owned Web</option>
+            <option>Email/CRM</option>
+            <option>Events/Webinars</option>
+            <option>Field/Rep</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-purple-200 mb-1">Constraint</label>
+          <select id="constraint" class="select-dark w-full">
+            <option>Compliance-first</option>
+            <option>Budget-light</option>
+            <option>Speed-to-insight</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-purple-200 mb-1">Lifecycle Stage</label>
+          <select id="lifecycle" class="select-dark w-full">
+            <option>Launch</option>
+            <option>Growth</option>
+            <option>Mature</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-purple-200 mb-1">Therapeutic Area</label>
+          <select id="therapeutic" class="select-dark w-full">
+            <option>Oncology</option>
+            <option>Immunology</option>
+            <option>Cardio</option>
+            <option>Rare Disease</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center gap-3">
+        <button id="run" class="rounded-xl bg-amber-400/90 px-4 py-2 font-semibold text-black hover:bg-amber-300">Recommend KPIs</button>
+        <button id="reset" class="rounded-xl border border-purple-300/40 px-4 py-2 text-purple-100 hover:bg-white/5">Reset</button>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section id="result" class="hidden">
+      <div class="grid lg:grid-cols-3 gap-6">
+        <article class="card rounded-2xl p-5">
+          <h2 class="text-xl font-bold mb-2">Recommended KPIs</h2>
+          <div id="kpis" class="flex flex-wrap gap-2"></div>
+        </article>
+        <article class="card rounded-2xl p-5">
+          <h2 class="text-xl font-bold mb-2">Example Data Sources</h2>
+          <div id="sources" class="space-y-2"></div>
+        </article>
+        <article class="card rounded-2xl p-5">
+          <h2 class="text-xl font-bold mb-2">Next Actions</h2>
+          <ul id="actions" class="list-disc pl-5 space-y-2"></ul>
+        </article>
+      </div>
+
+      <div class="mt-6 text-center">
+        <a href="B2BCM_Pharma_KPI_Map.xlsx" download class="inline-flex items-center gap-2 rounded-xl pill px-4 py-2 font-semibold hover:bg-white/10">
+          Download the full KPI Excel map
+        </a>
+      </div>
+    </section>
+
+    <section id="contact" class="text-center mt-12 text-purple-200">
+      <p>© B2B Creative Marketing • Technology partnerships powered by Integrated Eight™</p>
+    </section>
+  </main>
+
+<script>
+// --- Rules ---
+const RULES = [
+  { match:{goal:'Awareness',audience:'HCP',channel:'Paid',lifecycle:'Launch',therapeutic:'Oncology'},
+    kpis:['Share of Voice','Unbranded Search Volume','Website Reach','Paid Impression Quality'],
+    sources:['IQVIA, Brandwatch','Google Trends, SEMrush','GA4 / Adobe Analytics','DV360 / Google Ads'],
+    actions:['Seed unbranded oncology keywords','Stand up server-side tagging','Weekly insight memo to brand lead'] },
+  { match:{goal:'Engagement',audience:'HCP',channel:'Email/CRM',lifecycle:'Growth',therapeutic:'Immunology'},
+    kpis:['Email Open / CTR','HCP Click-Through Rate','Detail Aid Interactions'],
+    sources:['Salesforce MC / Veeva CRM','GA4 / Adobe','Veeva CLM'],
+    actions:['Segment by specialty & payer mix','A/B test subject lines','Rep follow-up playbook'] },
+  { match:{goal:'Conversion',audience:'Patient',channel:'Owned Web',lifecycle:'Launch',therapeutic:'Rare Disease'},
+    kpis:['Form Completion Rate','Call Center Handoffs','Trial Sign-Ups'],
+    sources:['GA4 + HubSpot/Marketo','Telephony/CRM','Clinical Trials CRM'],
+    actions:['Reduce form fields + add consent microcopy','Route high-intent leads in <5 min','Retarget drop-offs with event funnels'] },
+  { match:{goal:'Retention',audience:'Patient',channel:'Email/CRM',lifecycle:'Mature',therapeutic:'Cardio'},
+    kpis:['Adherence Rate','Refill Rate','Re-engagement Rate','NPS / Satisfaction'],
+    sources:['Claims + CRM','Pharmacy/IQVIA','GA4 + CRM','Qualtrics/Medallia'],
+    actions:['Refill reminder cadence','Churn-risk segment + win-back','Monthly patient experience pulse'] }
+];
+
+const CONSTRAINT_HINTS = {
+  'Compliance-first':['Run a pixel/tag audit; remove PHI-risk params','Move to server-side tagging; enforce consent gating'],
+  'Budget-light':['Start with top 3 KPIs; automate weekly memo','Leverage GA4/CRM before net-new tooling'],
+  'Speed-to-insight':['Quick dashboard + “Insight Memo” cadence','Pilot GenAI summaries for weekly reviews']
+};
+
+function recommend(inputs){
+  const scored = RULES.map(r=>{
+    let score = 0; const m = r.match;
+    if(m.goal===inputs.goal) score++;
+    if(m.audience===inputs.audience) score++;
+    if(m.channel===inputs.channel) score++;
+    if(m.lifecycle===inputs.lifecycle) score++;
+    if(m.therapeutic===inputs.therapeutic) score++;
+    return {r, score};
+  }).sort((a,b)=>b.score-a.score);
+
+  const best = scored[0]?.r || null;
+  if(!best) return null;
+  const hints = CONSTRAINT_HINTS[inputs.constraint] || [];
+  return {kpis:best.kpis, sources:best.sources, actions:[...best.actions, ...hints]};
+}
+
+function pill(text){ const span=document.createElement('span'); span.className='inline-block pill rounded-lg px-3 py-1'; span.textContent=text; return span; }
+
+document.getElementById('run').addEventListener('click', ()=>{
+  const inputs = {
+    goal: document.getElementById('goal').value,
+    audience: document.getElementById('audience').value,
+    channel: document.getElementById('channel').value,
+    constraint: document.getElementById('constraint').value,
+    lifecycle: document.getElementById('lifecycle').value,
+    therapeutic: document.getElementById('therapeutic').value
+  };
+  const out = recommend(inputs);
+  const result = document.getElementById('result');
+  if(!out){ result.classList.add('hidden'); return; }
+
+  // KPIs
+  const k = document.getElementById('kpis'); k.innerHTML=''; out.kpis.forEach(x=>k.appendChild(pill(x)));
+  // Sources
+  const s = document.getElementById('sources'); s.innerHTML = out.sources.map(x=>`<div>${x}</div>`).join('');
+  // Actions
+  const a = document.getElementById('actions'); a.innerHTML = out.actions.map(x=>`<li>${x}</li>`).join('');
+
+  result.classList.remove('hidden');
+});
+
+document.getElementById('reset').addEventListener('click', ()=>{
+  document.getElementById('result').classList.add('hidden');
+});
+</script>
+</body>
+</html>
