@@ -1,237 +1,390 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Pharma KPI Recommender • B2B Creative Marketing</title>
-<meta name="description" content="Interactive KPI recommender for pharma & life-sciences marketing. Pick your scenario and get recommended KPIs, data sources, and next actions." />
-<meta name="theme-color" content="#0a1728" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pharma KPI Recommender • B2BCM</title>
+  <meta name="description" content="B2BCM Pharma KPI Recommender — connect business goals with measurable, compliance-aware KPIs." />
+  <style>
+    :root{
+      --bg1:#0b1020; --bg2:#0c1124; --bg3:#0b0f1f;
+      --text:#e6ebff; --muted:#b9c0d0;
+      --border: rgba(255,255,255,.08); --border2: rgba(255,255,255,.12);
+      --panel: rgba(255,255,255,.03); --panel2: rgba(255,255,255,.06);
+      --amber:#f5b301; --accent:#7c6cf3;
+      --green:#22c55e; --yellow:#eab308; --red:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 50% -10%, #1d2240 0%, transparent 60%),
+                  radial-gradient(800px 400px at 10% 30%, #241a46 0%, transparent 55%),
+                  linear-gradient(180deg, var(--bg2), var(--bg1) 60%, var(--bg3));
+    }
+    .wrap{max-width:1020px; margin:0 auto; padding:56px 20px 80px}
+    header h1{margin:0 0 8px; text-align:center; font-size:44px; letter-spacing:.3px}
+    header p{margin:0; text-align:center; color:var(--muted)}
+    .panel{background:var(--panel); border:1px solid var(--border); border-radius:16px}
+    .panel-header{display:flex; justify-content:space-between; align-items:center; gap:12px; padding:16px; border-bottom:1px solid var(--border)}
+    .panel-title{margin:0; font-size:16px; font-weight:600}
+    .panel-sub{margin:2px 0 0; color:var(--muted); font-size:12px}
+    .controls{margin:28px auto 0; max-width:840px}
+    .group{display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:12px 16px}
+    .group label{min-width:140px; color:var(--muted); font-size:13px}
+    .chip-btn{border:1px solid var(--border2); background:rgba(255,255,255,.04); color:var(--text); padding:8px 12px; border-radius:999px; font-size:14px; cursor:pointer}
+    .chip-btn[aria-pressed="true"]{outline:2px solid #3b82f6; outline-offset:1px; background:rgba(59,130,246,.15)}
+    .btn{appearance:none; border:1px solid var(--border2); background:rgba(255,255,255,.06); color:var(--text); padding:10px 14px; border-radius:12px; font-weight:600; cursor:pointer}
+    .btn-amber{background:rgba(245,179,1,.12); border-color:rgba(245,179,1,.35)}
+    .btn:hover{filter:brightness(1.1)}
+    .bar-actions{display:flex; gap:10px; justify-content:center; padding:12px 16px}
+    .muted{color:var(--muted)}
+    .hidden{display:none}
 
-<!-- Icons -->
-<link rel="icon" href="favicon.ico" sizes="any" />
-<link rel="icon" type="image/png" href="favicon-512.png" sizes="512x512" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    /* selects */
+    .select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#e6ebff;padding:10px 12px;border-radius:12px}
 
-<!-- Social (Open Graph / Twitter) -->
-<meta property="og:title" content="Pharma & Life-Sciences Omnichannel KPI Recommender" />
-<meta property="og:description" content="Free, interactive tool: choose your scenario → get KPIs, data sources, and next actions." />
-<meta property="og:image" content="og-b2bcm-kpi.png" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Pharma & Life-Sciences Omnichannel KPI Recommender" />
-<meta name="twitter:description" content="Free, interactive tool: choose your scenario → get KPIs, data sources, and next actions." />
-<meta name="twitter:image" content="og-b2bcm-kpi.png" />
+    /* Results table */
+    .table-wrap{overflow:auto}
+    table{width:100%; border-collapse:collapse}
+    th,td{padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; font-size:14px}
+    th{color:#cfd6ea; font-weight:600}
+    .chip{display:inline-block; padding:.15rem .55rem; border-radius:999px; border:1px solid var(--border2); font-size:11px; letter-spacing:.02em}
+    .dot{display:inline-block; width:10px; height:10px; border-radius:999px; vertical-align:-1px}
+    .dot-green{background:var(--green)} .dot-yellow{background:var(--yellow)} .dot-red{background:var(--red)}
+    .status-text{font-size:11px; letter-spacing:.04em; opacity:.9; margin-left:6px}
+    .actual-cell{min-width:72px; border-radius:8px}
+    .actual-cell:focus{outline:2px solid #3b82f6; background:rgba(59,130,246,.12)}
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  :root{--navy:#0a1728;--navy2:#17283f;--purple:#8b5cf6;--glass:rgba(23,23,40,.6)}
-  body{font-family:'Inter',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-       background: radial-gradient(1200px 800px at 20% 10%, rgba(139,92,246,.18), transparent 50%),
-                  radial-gradient(1000px 700px at 80% 80%, rgba(240,171,252,.14), transparent 55%),
-                  linear-gradient(180deg, var(--navy), var(--navy2)); color:#eef2ff;}
-  .card{background-color:var(--glass); border:1px solid rgba(139,92,246,.35); backdrop-filter:blur(10px)}
-  .pill{background:rgba(139,92,246,.12); border:1px solid rgba(139,92,246,.3)}
-  .title-glow{text-shadow:0 0 10px rgba(227,199,112,.35), 0 0 18px rgba(139,92,246,.2)}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0}
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px}
+    .card.stat .label{color:var(--muted); font-size:12px}
+    .card.stat .value{display:flex; align-items:center; gap:8px; font-size:26px; font-weight:700}
 
-  /* HIGH CONTRAST SELECTS */
-  .select-dark{
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-color: #152338; /* darker background */
-    color: #eef2ff;            /* bright text */
-    border: 1px solid rgba(139, 92, 246, .6);
-    padding: .5rem .75rem;
-    border-radius: .5rem;
-  }
-  .select-dark:focus{ outline: 2px solid rgba(227,199,112,.55); outline-offset: 2px; }
-  .select-dark::-ms-expand { display: none; } /* IE/Edge arrow */
-  /* Some browsers honor option styling */
-  option{ background-color:#0f1a30; color:#eef2ff; }
-  /* Hint to use dark menus on supported UAs */
-  :root{ color-scheme: dark; }
-</style>
+    .footer{margin-top:28px; text-align:center; color:var(--muted); font-size:12px}
+    a.link{color:#c5b8ff; text-decoration:none} a.link:hover{text-decoration:underline}
+
+    /* Segmented toggle */
+    .seg{display:inline-flex; border:1px solid var(--border2); border-radius:12px; overflow:hidden}
+    .seg button{padding:8px 12px; background:transparent; color:var(--text); border:0; cursor:pointer}
+    .seg button[aria-pressed="true"]{background:rgba(255,255,255,.08)}
+  </style>
 </head>
-<body class="min-h-screen">
-  <main class="max-w-6xl mx-auto px-4 py-10">
-    <header class="text-center mb-8">
-      <h1 class="text-3xl md:text-4xl font-extrabold title-glow">Pharma KPI Recommender (If‑This‑Then‑That)</h1>
-      <p class="text-purple-200 mt-2">Pick your scenario → get recommended KPIs, data sources, and next actions.</p>
-      <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <a href="B2BCM_Pharma_KPI_Map.xlsx" download
-           class="inline-flex items-center gap-2 rounded-xl bg-amber-400/90 px-4 py-2 font-semibold text-black hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>
-          </svg>
-          Download Excel KPI Map
-        </a>
-        <a href="#contact" class="inline-flex items-center gap-2 rounded-xl border border-purple-400/40 px-4 py-2 font-semibold text-purple-100 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-purple-300/30">Talk about a personalized rollout</a>
-      </div>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Pharma KPI Recommender</h1>
+      <p>Pick your scenario → get recommended KPIs, data sources, and next actions.</p>
     </header>
 
-    <!-- Controls -->
-    <section class="card rounded-2xl p-5 mb-6">
-      <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div>
-          <label class="block text-sm text-purple-200 mb-1">Goal</label>
-          <select id="goal" class="select-dark w-full">
-            <option>Awareness</option>
-            <option>Engagement</option>
-            <option>Conversion</option>
-            <option>Retention</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm text-purple-200 mb-1">Audience</label>
-          <select id="audience" class="select-dark w-full">
-            <option>HCP</option>
-            <option>Patient</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm text-purple-200 mb-1">Channel</label>
-          <select id="channel" class="select-dark w-full">
-            <option>Paid</option>
-            <option>Owned Web</option>
-            <option>Email/CRM</option>
-            <option>Events/Webinars</option>
-            <option>Field/Rep</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm text-purple-200 mb-1">Constraint</label>
-          <select id="constraint" class="select-dark w-full">
-            <option>Compliance-first</option>
-            <option>Budget-light</option>
-            <option>Speed-to-insight</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm text-purple-200 mb-1">Lifecycle Stage</label>
-          <select id="lifecycle" class="select-dark w-full">
-            <option>Launch</option>
-            <option>Growth</option>
-            <option>Mature</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm text-purple-200 mb-1">Therapeutic Area</label>
-          <select id="therapeutic" class="select-dark w-full">
-            <option>Oncology</option>
-            <option>Immunology</option>
-            <option>Cardio</option>
-            <option>Rare Disease</option>
-          </select>
-        </div>
+    <!-- UI style switch -->
+    <div class="bar-actions" aria-label="UI style switch">
+      <span class="muted" style="align-self:center">UI Style</span>
+      <div class="seg" role="tablist" aria-label="UI Style">
+        <button id="styleChips" role="tab" aria-selected="true" aria-pressed="true">Chips</button>
+        <button id="styleDropdowns" role="tab" aria-selected="false" aria-pressed="false">Dropdowns</button>
       </div>
-      <div class="mt-4 flex items-center gap-3">
-        <button id="run" class="rounded-xl bg-amber-400/90 px-4 py-2 font-semibold text-black hover:bg-amber-300">Recommend KPIs</button>
-        <button id="reset" class="rounded-xl border border-purple-300/40 px-4 py-2 text-purple-100 hover:bg-white/5">Reset</button>
+    </div>
+
+    <!-- Scenario Controls (CHIPS) -->
+    <section id="controlsChips" class="panel controls" aria-label="Scenario controls (chips)">
+      <div class="group">
+        <label>Goal</label>
+        <button class="chip-btn" data-chip="goal" aria-pressed="true">Awareness</button>
+        <button class="chip-btn" data-chip="goal">Engagement</button>
+        <button class="chip-btn" data-chip="goal">Conversion</button>
+      </div>
+      <div class="group">
+        <label>Audience</label>
+        <button class="chip-btn" data-chip="aud" aria-pressed="true">HCP</button>
+        <button class="chip-btn" data-chip="aud">Patient</button>
+      </div>
+      <div class="group">
+        <label>Channel</label>
+        <button class="chip-btn" data-chip="chn" aria-pressed="true">Paid</button>
+        <button class="chip-btn" data-chip="chn">Email</button>
+        <button class="chip-btn" data-chip="chn">Field</button>
+      </div>
+      <div class="group">
+        <label>Constraint</label>
+        <button class="chip-btn" data-chip="con" aria-pressed="true">Compliance-first</button>
+        <button class="chip-btn" data-chip="con">Budget</button>
+        <button class="chip-btn" data-chip="con">Speed</button>
+      </div>
+      <div class="group">
+        <label>Lifecycle Stage</label>
+        <button class="chip-btn" data-chip="life" aria-pressed="true">Launch</button>
+        <button class="chip-btn" data-chip="life">Growth</button>
+        <button class="chip-btn" data-chip="life">LOE</button>
+      </div>
+      <div class="group">
+        <label>Therapeutic Area</label>
+        <button class="chip-btn" data-chip="ta" aria-pressed="true">Oncology</button>
+        <button class="chip-btn" data-chip="ta">Cardio</button>
+        <button class="chip-btn" data-chip="ta">Immunology</button>
+      </div>
+      <div class="bar-actions">
+        <a class="btn btn-amber" href="./B2BCM_Pharma_KPI_Map.xlsx" download>⬇ Download Excel KPI Map</a>
+        <a class="btn" href="mailto:j.gracey@b2bcreativemarketing.com?subject=B2BCM%20Pharma%20KPI%20Rollout">Talk about a personalized rollout</a>
+      </div>
+      <div class="bar-actions">
+        <button id="recommendBtn" class="btn btn-amber">Recommend KPIs</button>
+        <button id="resetBtn" class="btn">Reset</button>
       </div>
     </section>
 
-    <!-- Results -->
-    <section id="result" class="hidden">
-      <div class="grid lg:grid-cols-3 gap-6">
-        <article class="card rounded-2xl p-5">
-          <h2 class="text-xl font-bold mb-2">Recommended KPIs</h2>
-          <div id="kpis" class="flex flex-wrap gap-2"></div>
-        </article>
-        <article class="card rounded-2xl p-5">
-          <h2 class="text-xl font-bold mb-2">Example Data Sources</h2>
-          <div id="sources" class="space-y-2"></div>
-        </article>
-        <article class="card rounded-2xl p-5">
-          <h2 class="text-xl font-bold mb-2">Next Actions</h2>
-          <ul id="actions" class="list-disc pl-5 space-y-2"></ul>
-        </article>
+    <!-- Scenario Controls (DROPDOWNS) -->
+    <section id="controlsDropdowns" class="panel controls hidden" aria-label="Scenario controls (dropdowns)">
+      <div class="group"><label>Goal</label>
+        <select id="selGoal" class="select"><option>Awareness</option><option>Engagement</option><option>Conversion</option></select>
       </div>
-
-      <div class="mt-6 text-center">
-        <a href="B2BCM_Pharma_KPI_Map.xlsx" download class="inline-flex items-center gap-2 rounded-xl pill px-4 py-2 font-semibold hover:bg-white/10">
-          Download the full KPI Excel map
-        </a>
+      <div class="group"><label>Audience</label>
+        <select id="selAudience" class="select"><option>HCP</option><option>Patient</option></select>
+      </div>
+      <div class="group"><label>Channel</label>
+        <select id="selChannel" class="select"><option>Paid</option><option>Email</option><option>Field</option></select>
+      </div>
+      <div class="group"><label>Constraint</label>
+        <select id="selConstraint" class="select"><option>Compliance-first</option><option>Budget</option><option>Speed</option></select>
+      </div>
+      <div class="group"><label>Lifecycle Stage</label>
+        <select id="selLifecycle" class="select"><option>Launch</option><option>Growth</option><option>LOE</option></select>
+      </div>
+      <div class="group"><label>Therapeutic Area</label>
+        <select id="selTA" class="select"><option>Oncology</option><option>Cardio</option><option>Immunology</option></select>
+      </div>
+      <div class="bar-actions">
+        <a class="btn btn-amber" href="./B2BCM_Pharma_KPI_Map.xlsx" download>⬇ Download Excel KPI Map</a>
+        <a class="btn" href="mailto:j.gracey@b2bcreativemarketing.com?subject=B2BCM%20Pharma%20KPI%20Rollout">Talk about a personalized rollout</a>
+      </div>
+      <div class="bar-actions">
+        <button id="recommendBtn2" class="btn btn-amber">Recommend KPIs</button>
+        <button id="resetBtn2" class="btn">Reset</button>
       </div>
     </section>
 
-    <section id="contact" class="text-center mt-12 text-purple-200">
-      <p>© B2B Creative Marketing • Technology partnerships powered by Integrated Eight™</p>
+    <!-- Results: Pharma KPI Pack -->
+    <section id="kpi-results" class="panel" style="display:none; margin-top:28px;">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Recommended KPIs (Pharma Pack)</h2>
+          <p class="panel-sub">Category-colored with simple benchmark status</p>
+        </div>
+        <div class="panel-actions">
+          <button id="exportCsvBtn" class="btn">Export CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="kpi-table" id="kpiTable">
+          <thead>
+            <tr>
+              <th>KPI</th><th>Category</th><th>Target</th><th>Actual</th>
+              <th>Metric</th><th>Frequency</th><th>Status</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody><!-- injected by JS --></tbody>
+        </table>
+      </div>
     </section>
-  </main>
 
-<script>
-// --- Rules ---
-const RULES = [
-  { match:{goal:'Awareness',audience:'HCP',channel:'Paid',lifecycle:'Launch',therapeutic:'Oncology'},
-    kpis:['Share of Voice','Unbranded Search Volume','Website Reach','Paid Impression Quality'],
-    sources:['IQVIA, Brandwatch','Google Trends, SEMrush','GA4 / Adobe Analytics','DV360 / Google Ads'],
-    actions:['Seed unbranded oncology keywords','Stand up server-side tagging','Weekly insight memo to brand lead'] },
-  { match:{goal:'Engagement',audience:'HCP',channel:'Email/CRM',lifecycle:'Growth',therapeutic:'Immunology'},
-    kpis:['Email Open / CTR','HCP Click-Through Rate','Detail Aid Interactions'],
-    sources:['Salesforce MC / Veeva CRM','GA4 / Adobe','Veeva CLM'],
-    actions:['Segment by specialty & payer mix','A/B test subject lines','Rep follow-up playbook'] },
-  { match:{goal:'Conversion',audience:'Patient',channel:'Owned Web',lifecycle:'Launch',therapeutic:'Rare Disease'},
-    kpis:['Form Completion Rate','Call Center Handoffs','Trial Sign-Ups'],
-    sources:['GA4 + HubSpot/Marketo','Telephony/CRM','Clinical Trials CRM'],
-    actions:['Reduce form fields + add consent microcopy','Route high-intent leads in <5 min','Retarget drop-offs with event funnels'] },
-  { match:{goal:'Retention',audience:'Patient',channel:'Email/CRM',lifecycle:'Mature',therapeutic:'Cardio'},
-    kpis:['Adherence Rate','Refill Rate','Re-engagement Rate','NPS / Satisfaction'],
-    sources:['Claims + CRM','Pharmacy/IQVIA','GA4 + CRM','Qualtrics/Medallia'],
-    actions:['Refill reminder cadence','Churn-risk segment + win-back','Monthly patient experience pulse'] }
-];
+    <section id="kpi-stats" style="display:none;">
+      <div class="grid-3">
+        <div class="card stat"><div class="label">Good</div><div class="value"><span class="dot dot-green"></span><span id="goodCount">0</span></div></div>
+        <div class="card stat"><div class="label">Watch</div><div class="value"><span class="dot dot-yellow"></span><span id="watchCount">0</span></div></div>
+        <div class="card stat"><div class="label">Action</div><div class="value"><span class="dot dot-red"></span><span id="actionCount">0</span></div></div>
+      </div>
+      <div class="card"><h3 style="margin:0 0 8px; font-size:16px;">Insight Summary</h3><p id="insightSummary" class="muted" style="margin:0;"></p></div>
+    </section>
 
-const CONSTRAINT_HINTS = {
-  'Compliance-first':['Run a pixel/tag audit; remove PHI-risk params','Move to server-side tagging; enforce consent gating'],
-  'Budget-light':['Start with top 3 KPIs; automate weekly memo','Leverage GA4/CRM before net-new tooling'],
-  'Speed-to-insight':['Quick dashboard + “Insight Memo” cadence','Pilot GenAI summaries for weekly reviews']
-};
+    <p class="footer">© <span id="yr"></span> B2B Creative Marketing • Technology partnerships powered by Integrated Eight™</p>
+  </div>
 
-function recommend(inputs){
-  const scored = RULES.map(r=>{
-    let score = 0; const m = r.match;
-    if(m.goal===inputs.goal) score++;
-    if(m.audience===inputs.audience) score++;
-    if(m.channel===inputs.channel) score++;
-    if(m.lifecycle===inputs.lifecycle) score++;
-    if(m.therapeutic===inputs.therapeutic) score++;
-    return {r, score};
-  }).sort((a,b)=>b.score-a.score);
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
 
-  const best = scored[0]?.r || null;
-  if(!best) return null;
-  const hints = CONSTRAINT_HINTS[inputs.constraint] || [];
-  return {kpis:best.kpis, sources:best.sources, actions:[...best.actions, ...hints]};
-}
+    // UI style toggle
+    const chipsBtn = document.getElementById('styleChips');
+    const ddBtn = document.getElementById('styleDropdowns');
+    const chipsSection = document.getElementById('controlsChips');
+    const ddSection = document.getElementById('controlsDropdowns');
+    function setStyle(mode){
+      const chips = mode === 'chips';
+      chipsSection.classList.toggle('hidden', !chips);
+      ddSection.classList.toggle('hidden', chips);
+      chipsBtn.setAttribute('aria-pressed', chips);
+      ddBtn.setAttribute('aria-pressed', !chips);
+      chipsBtn.setAttribute('aria-selected', chips);
+      ddBtn.setAttribute('aria-selected', !chips);
+      localStorage.setItem('b2bcm_ui_style', mode);
+    }
+    chipsBtn.addEventListener('click',()=>setStyle('chips'));
+    ddBtn.addEventListener('click',()=>setStyle('dropdowns'));
+    setStyle(localStorage.getItem('b2bcm_ui_style')||'chips');
 
-function pill(text){ const span=document.createElement('span'); span.className='inline-block pill rounded-lg px-3 py-1'; span.textContent=text; return span; }
+    // Simple chip selection behavior
+    document.querySelectorAll('.chip-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const groupAttr = btn.getAttribute('data-chip');
+        document.querySelectorAll('.chip-btn[data-chip="'+groupAttr+'"]').forEach(b=>b.setAttribute('aria-pressed','false'));
+        btn.setAttribute('aria-pressed','true');
+      });
+    });
 
-document.getElementById('run').addEventListener('click', ()=>{
-  const inputs = {
-    goal: document.getElementById('goal').value,
-    audience: document.getElementById('audience').value,
-    channel: document.getElementById('channel').value,
-    constraint: document.getElementById('constraint').value,
-    lifecycle: document.getElementById('lifecycle').value,
-    therapeutic: document.getElementById('therapeutic').value
-  };
-  const out = recommend(inputs);
-  const result = document.getElementById('result');
-  if(!out){ result.classList.add('hidden'); return; }
+    // Category chip styles (dark palette)
+    const CATEGORY_STYLES = {
+      "HCP Engagement": { bg:"#0b3e8515", text:"#8bb4ff", border:"#335ea6" },
+      "Field Force":    { bg:"#0a5a4315", text:"#76e1b8", border:"#2aa67f" },
+      "Patient Journey":{ bg:"#7a4a0115", text:"#ffc76e", border:"#b97a1d" },
+      "Compliance":     { bg:"#7a2f0015", text:"#ffb38a", border:"#b25522" },
+      "Brand Health":   { bg:"#3f196f15", text:"#c6a9ff", border:"#7b56cc" },
+    };
 
-  // KPIs
-  const k = document.getElementById('kpis'); k.innerHTML=''; out.kpis.forEach(x=>k.appendChild(pill(x)));
-  // Sources
-  const s = document.getElementById('sources'); s.innerHTML = out.sources.map(x=>`<div>${x}</div>`).join('');
-  // Actions
-  const a = document.getElementById('actions'); a.innerHTML = out.actions.map(x=>`<li>${x}</li>`).join('');
+    // Seed KPIs
+    const STORAGE_KEY = 'b2bcm_pharma_kpis_v2';
+    const DEFAULT_KPIS = [
+      { id:"k1", name:"HCP Reach Rate",        category:"HCP Engagement", metricType:"%",    target:75, actual:68, frequency:"Monthly",   notes:"IQVIA + Veeva CRM" },
+      { id:"k2", name:"Email Open Rate",       category:"HCP Engagement", metricType:"%",    target:28, actual:31, frequency:"Weekly",    notes:"SFMC (Approved Email)" },
+      { id:"k3", name:"Content Recall Score",  category:"Brand Health",   metricType:"%",    target:60, actual:55, frequency:"Quarterly", notes:"Medscape / Panel" },
+      { id:"k4", name:"Review Cycle Time",     category:"Compliance",     metricType:"days", target:10, actual:12, frequency:"Monthly",   notes:"Veeva PromoMats" },
+      { id:"k5", name:"Adherence (6 mo)",      category:"Patient Journey",metricType:"%",    target:70, actual:74, frequency:"Bi-Annual", notes:"Specialty Pharmacy Feed" },
+      { id:"k6", name:"Digital Detailing Rate",category:"Field Force",    metricType:"%",    target:25, actual:19, frequency:"Monthly",   notes:"Veeva CLM / OCE" },
+    ];
 
-  result.classList.remove('hidden');
-});
+    let PHARMA_KPIS = restoreKpis();
 
-document.getElementById('reset').addEventListener('click', ()=>{
-  document.getElementById('result').classList.add('hidden');
-});
-</script>
+    function restoreKpis(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return JSON.parse(JSON.stringify(DEFAULT_KPIS));
+      try{
+        const saved = JSON.parse(raw);
+        // merge with defaults in case of version changes
+        const merged = DEFAULT_KPIS.map((d,i)=> ({...d, ...(saved[i]||{})}));
+        return merged;
+      }catch{ return JSON.parse(JSON.stringify(DEFAULT_KPIS)); }
+    }
+
+    // Status logic
+    function statusFor(kpi){
+      const lowerIsBetter = String(kpi.metricType).toLowerCase().includes('day');
+      const ratio = (kpi.actual / kpi.target) * 100;
+      if (lowerIsBetter){
+        if (ratio <= 105) return 'green';
+        if (ratio <= 120) return 'yellow';
+        return 'red';
+      } else {
+        if (ratio >= 95) return 'green';
+        if (ratio >= 80) return 'yellow';
+        return 'red';
+      }
+    }
+
+    function chip(category){
+      const s = CATEGORY_STYLES[category] || {};
+      return `<span class="chip" style="background:${s.bg||'transparent'}; color:${s.text||'#ddd'}; border:1px solid ${s.border||'#555'};">${category}</span>`;
+    }
+    function dot(color){
+      const map = { green:'#22c55e', yellow:'#eab308', red:'#ef4444' };
+      return `<span class="dot" style="background:${map[color]||'#999'};"></span>`;
+    }
+
+    function renderKpiResults(kpis){
+      const tbody = document.querySelector('#kpiTable tbody');
+      const rows = kpis.map((k,i)=>{
+        const s = statusFor(k);
+        const actualDisplay = k.actual + (k.metricType === '%' ? '%' : '');
+        const targetDisplay = k.target + (k.metricType === '%' ? '%' : '');
+        return `
+          <tr data-index="${i}">
+            <td>${k.name}</td>
+            <td>${chip(k.category)}</td>
+            <td>${targetDisplay}</td>
+            <td contenteditable="true" class="actual-cell">${actualDisplay}</td>
+            <td>${k.metricType}</td>
+            <td>${k.frequency}</td>
+            <td class="status-cell">${dot(s)} <span class="status-text">${s.toUpperCase()}</span></td>
+            <td class="muted">${k.notes}</td>
+          </tr>`;
+      }).join('');
+      tbody.innerHTML = rows;
+
+      // attach inline edit listeners
+      document.querySelectorAll('.actual-cell').forEach(cell=>{
+        cell.addEventListener('blur', onActualEdit);
+        cell.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); cell.blur(); } });
+      });
+
+      updateTalliesAndSummary(kpis);
+      showResults();
+    }
+
+    function onActualEdit(e){
+      const row = e.target.closest('tr');
+      const idx = Number(row.dataset.index);
+      const k = PHARMA_KPIS[idx];
+      const text = e.target.textContent.trim().replace('%','');
+      const val = Number(text);
+      if(!Number.isFinite(val)){
+        // revert to previous
+        e.target.textContent = k.actual + (k.metricType==='%'?'%':'');
+        return;
+      }
+      k.actual = val;
+      persistKpis();
+      // update status
+      const s = statusFor(k);
+      row.querySelector('.status-cell').innerHTML = `${dot(s)} <span class="status-text">${s.toUpperCase()}</span>`;
+      updateTalliesAndSummary(PHARMA_KPIS);
+    }
+
+    function updateTalliesAndSummary(kpis){
+      const t = { green:0, yellow:0, red:0 };
+      kpis.forEach(k=> t[statusFor(k)]++ );
+      document.getElementById('goodCount').textContent = t.green;
+      document.getElementById('watchCount').textContent = t.yellow;
+      document.getElementById('actionCount').textContent = t.red;
+      const score = t.green*2 + t.yellow*1 - t.red*1;
+      const overall = score >= 4 ? 'green' : score >= 1 ? 'yellow' : 'red';
+      document.getElementById('insightSummary').textContent =
+        overall==='green' ? 'Strong overall performance: maintain cadence and reinforce high-performing channels.' :
+        overall==='yellow' ? 'Mixed signals: tighten execution on underperformers and review message–channel fit.' :
+        'Priority action required: investigate low KPIs and address bottlenecks this cycle.';
+    }
+
+    function showResults(){
+      document.getElementById('kpi-results').style.display = 'block';
+      document.getElementById('kpi-stats').style.display = 'block';
+      window.scrollTo({ top: document.getElementById('kpi-results').offsetTop - 20, behavior:'smooth' });
+    }
+
+    function persistKpis(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(PHARMA_KPIS)); }
+
+    function exportCsv(kpis){
+      const headers = ["KPI","Category","Target","Actual","Metric","Frequency","Status","Notes"];
+      const rows = kpis.map(k=> [k.name,k.category,k.target,k.actual,k.metricType,k.frequency,statusFor(k),k.notes]);
+      const csv = [headers, ...rows].map(r=>r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "b2bcm_kpi_pharma_demo.csv"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Buttons
+    document.getElementById('recommendBtn').addEventListener('click', ()=>{ PHARMA_KPIS = restoreKpis(); renderKpiResults(PHARMA_KPIS); });
+    document.getElementById('recommendBtn2').addEventListener('click', ()=>{ PHARMA_KPIS = restoreKpis(); renderKpiResults(PHARMA_KPIS); });
+    document.getElementById('exportCsvBtn').addEventListener('click', ()=> exportCsv(PHARMA_KPIS));
+
+    function resetView(){
+      document.getElementById('kpi-results').style.display = 'none';
+      document.getElementById('kpi-stats').style.display = 'none';
+      document.querySelector('#kpiTable tbody').innerHTML = '';
+      document.getElementById('insightSummary').textContent='';
+      document.getElementById('goodCount').textContent='0';
+      document.getElementById('watchCount').textContent='0';
+      document.getElementById('actionCount').textContent='0';
+    }
+    document.getElementById('resetBtn').addEventListener('click', ()=>{ resetView(); /* keep persisted values */ });
+    document.getElementById('resetBtn2').addEventListener('click', ()=>{ resetView(); });
+
+  </script>
 </body>
 </html>
